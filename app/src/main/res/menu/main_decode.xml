@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_checked_all"
+        android:orderInCategory="100"
+        android:title="@string/action_checked_all"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_checked_invert"
+        android:orderInCategory="100"
+        android:title="@string/action_checked_invert"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_checked_cancel"
+        android:orderInCategory="100"
+        android:title="@string/action_checked_cancel"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_decode"
+        android:orderInCategory="100"
+        android:title="@string/action_decode"
+        app:showAsAction="never" />
+</menu>
