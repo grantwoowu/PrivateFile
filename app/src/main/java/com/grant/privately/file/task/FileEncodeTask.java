@@ -131,6 +131,7 @@ public class FileEncodeTask extends AsyncTask<List<MediaPathEntry>,Integer,Boole
                     //删除旧文件
                     oldFile.renameTo(new File(oldFile.getParentFile(),System.currentTimeMillis()+""));
                     oldFile.delete();
+
                 }
             }
 
