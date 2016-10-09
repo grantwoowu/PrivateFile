@@ -20,7 +20,10 @@ import com.grant.privately.file.db.TbFileEncodeInfoHelper;
 import com.grant.privately.file.db.entry.FileEncodeInfo;
 import com.grant.privately.file.fragment.dummy.MediaPathEntry;
 import com.grant.privately.file.fragment.dummy.MediaType;
+import com.grant.privately.file.task.FileDecodeTask;
 import com.grant.privately.file.task.FileEncodeTask;
+import com.grant.privately.file.task.OnTaskFinishedListener;
+import com.grant.privately.file.utils.ImageLoaderHelper;
 import com.grant.privately.file.utils.MediaUtil;
 
 import java.io.File;
@@ -103,6 +106,7 @@ public class FileItemFragment extends Fragment implements DialogInterface.OnCanc
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
                 recyclerView.addItemDecoration(new SpaceItemDecoration(5));
             }
+            recyclerView.setOnScrollListener(ImageLoaderHelper.getRecyclerViewPauseOnScrollListener());
 
             progressDialog = new ProgressDialog(getContext());
             progressDialog.setOnCancelListener(this);
@@ -283,9 +287,15 @@ public class FileItemFragment extends Fragment implements DialogInterface.OnCanc
     public void setOptionId(int optionId){
         this.optionId = optionId;
         if (this.optionId == Constant.OPTION_ID_ENCODE && fileItemRecyclerViewAdapter !=null){
-            new FileEncodeTask(progressDialog).execute(fileItemRecyclerViewAdapter.getValues());
+            new FileEncodeTask(progressDialog,new TaskFinishedListener()).execute(fileItemRecyclerViewAdapter.getValues());
             return;
         }
+
+        if (this.optionId == Constant.OPTION_ID_DECODE && fileItemRecyclerViewAdapter !=null){
+            new FileDecodeTask(progressDialog,new TaskFinishedListener()).execute(fileItemRecyclerViewAdapter.getValues());
+            return;
+        }
+
 
 
         if (fileItemRecyclerViewAdapter !=null){
@@ -293,5 +303,14 @@ public class FileItemFragment extends Fragment implements DialogInterface.OnCanc
         }
 
 
+    }
+
+    private class TaskFinishedListener implements OnTaskFinishedListener{
+        @Override
+        public void onFinished() {
+            if (fileItemRecyclerViewAdapter!=null){
+                fileItemRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        }
     }
 }

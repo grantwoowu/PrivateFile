@@ -63,6 +63,31 @@ public class TbFileEncodeInfoHelper {
         return false;
     }
 
+    public FileEncodeInfo find(String shotPath){
+        SQLiteDatabase db = mDbOpenHelper.getWritableDatabase();
+        Cursor cursor = null;
+        try {
+
+            String selection = TbFileEncodeInfo.COL_NAME_MEDIA_SHOT+" = ?";
+            String []selectionArgs = {shotPath};
+            cursor = db.query(TbFileEncodeInfo.TB_NAME,null,selection,selectionArgs,null,null,null,null);
+            if (cursor!=null && cursor.getCount()>0){
+                cursor.moveToFirst();
+                return fillData(cursor);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (cursor!=null){
+                cursor.close();
+            }
+            close();
+        }
+
+        return null;
+    }
+
     public List<FileEncodeInfo> findAll(MediaType mediaType){
         SQLiteDatabase db = mDbOpenHelper.getWritableDatabase();
         Cursor cursor = null;

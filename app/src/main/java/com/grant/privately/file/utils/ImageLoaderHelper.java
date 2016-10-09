@@ -1,7 +1,9 @@
 package com.grant.privately.file.utils;
 
 import android.graphics.Bitmap;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 
 import com.grant.privately.file.universalimageloader.core.DisplayImageOptions;
@@ -9,6 +11,8 @@ import com.grant.privately.file.universalimageloader.core.ImageLoader;
 import com.grant.privately.file.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.grant.privately.file.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.grant.privately.file.universalimageloader.core.listener.ImageLoadingListener;
+import com.grant.privately.file.universalimageloader.core.listener.PauseOnScrollListener;
+import com.grant.privately.file.universalimageloader.core.listener.RecyclerViewPauseOnScrollListener;
 import com.grant.privately.file.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import java.io.File;
@@ -130,6 +134,14 @@ public class ImageLoaderHelper {
 	
 	public static DisplayImageOptions getDisplayImageOptions(){
 		return option;
+	}
+
+	public static AbsListView.OnScrollListener getPauseOnScrollListener(){
+		return new PauseOnScrollListener(ImageLoader.getInstance(),true,true);
+	}
+
+	public static RecyclerView.OnScrollListener getRecyclerViewPauseOnScrollListener(){
+		return new RecyclerViewPauseOnScrollListener(ImageLoader.getInstance(),true,true);
 	}
 
 	/**

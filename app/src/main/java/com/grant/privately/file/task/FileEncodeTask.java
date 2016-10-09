@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ import java.util.UUID;
  */
 
 public class FileEncodeTask extends AsyncTask<List<MediaPathEntry>,Integer,Boolean> {
+    private OnTaskFinishedListener mOnTaskFinishedListener;
     private ProgressDialog progressDialog;
     private int totalEncode = 0;
     private int currentCount = 0;
@@ -29,7 +31,8 @@ public class FileEncodeTask extends AsyncTask<List<MediaPathEntry>,Integer,Boole
     private byte[]head;
 
 
-    public FileEncodeTask (ProgressDialog progressDialog){
+    public FileEncodeTask (ProgressDialog progressDialog,OnTaskFinishedListener listener){
+        mOnTaskFinishedListener = listener;
         this.progressDialog = progressDialog;
         buff = new byte[64*1024];
         head = new byte[10];
@@ -60,11 +63,17 @@ public class FileEncodeTask extends AsyncTask<List<MediaPathEntry>,Integer,Boole
 
             TbFileEncodeInfoHelper helper = new TbFileEncodeInfoHelper(progressDialog.getContext());
             //开始加密
-            for (MediaPathEntry entry:datas){
+            Iterator<MediaPathEntry>iterator = datas.iterator();
+            while (iterator.hasNext()){
+                MediaPathEntry entry = iterator.next();
                 if (entry.isSelected()){
                     currentCount++;
                     publishProgress(currentCount);
-                    doEncode(progressDialog.getContext(),helper,entry);
+                    boolean encodeOk = doEncode(progressDialog.getContext(),helper,entry);
+                    //加密处理成功
+                    if (encodeOk){
+                        iterator.remove();
+                    }
                 }
             }
 
@@ -85,13 +94,16 @@ public class FileEncodeTask extends AsyncTask<List<MediaPathEntry>,Integer,Boole
         progressDialog.dismiss();
         if (aBoolean){
             Toast.makeText(progressDialog.getContext(),"加密完成",Toast.LENGTH_LONG).show();
+            if (mOnTaskFinishedListener!=null){
+                mOnTaskFinishedListener.onFinished();
+            }
         }else {
             Toast.makeText(progressDialog.getContext(),"请首先选择文件",Toast.LENGTH_LONG).show();
         }
 
     }
 
-    private void doEncode(Context context,TbFileEncodeInfoHelper helper, MediaPathEntry entry){
+    private boolean doEncode(Context context,TbFileEncodeInfoHelper helper, MediaPathEntry entry){
         FileInputStream fis = null;
         FileOutputStream fos = null;
         try {
@@ -129,8 +141,9 @@ public class FileEncodeTask extends AsyncTask<List<MediaPathEntry>,Integer,Boole
 
                 if(helper.insert(info)){
                     //删除旧文件
-                    oldFile.renameTo(new File(oldFile.getParentFile(),System.currentTimeMillis()+""));
-                    oldFile.delete();
+                    File toFile = new File(oldFile.getParentFile(),System.currentTimeMillis()+"");
+                    oldFile.renameTo(toFile);
+                    return toFile.delete();
 
                 }
             }
@@ -155,5 +168,8 @@ public class FileEncodeTask extends AsyncTask<List<MediaPathEntry>,Integer,Boole
             }
         }
 
+        return false;
+
     }
+
 }
